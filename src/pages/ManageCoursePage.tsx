@@ -3,10 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Plus, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Upload, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AddVideoDialog from "@/components/AddVideoDialog";
 import CourseKnowledgeBase from "@/components/CourseKnowledgeBase";
+import EditCourseDialog from "@/components/EditCourseDialog";
 
 interface Video {
   id: string;
@@ -22,7 +23,9 @@ export default function ManageCoursePage() {
   const { toast } = useToast();
   const [videos, setVideos] = useState<Video[]>([]);
   const [courseTitle, setCourseTitle] = useState("");
+  const [courseDescription, setCourseDescription] = useState("");
   const [showAddVideo, setShowAddVideo] = useState(false);
+  const [showEditCourse, setShowEditCourse] = useState(false);
 
   useEffect(() => {
     if (courseId) {
@@ -33,11 +36,14 @@ export default function ManageCoursePage() {
   const fetchCourseData = async () => {
     const { data: courseData } = await supabase
       .from("courses")
-      .select("title")
+      .select("title, description")
       .eq("id", courseId)
       .single();
 
-    if (courseData) setCourseTitle(courseData.title);
+    if (courseData) {
+      setCourseTitle(courseData.title);
+      setCourseDescription(courseData.description || "");
+    }
 
     const { data: videosData } = await supabase
       .from("videos")
@@ -75,10 +81,22 @@ export default function ManageCoursePage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">{courseTitle}</h1>
-            <p className="text-muted-foreground">Manage course videos</p>
+        <div className="flex justify-between items-start mb-8">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-4xl font-bold">{courseTitle}</h1>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowEditCourse(true)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </div>
+            {courseDescription && (
+              <p className="text-muted-foreground mb-2">{courseDescription}</p>
+            )}
+            <p className="text-sm text-muted-foreground">Manage course content</p>
           </div>
           <Button onClick={() => setShowAddVideo(true)}>
             <Plus className="h-4 w-4 mr-2" />
@@ -145,6 +163,15 @@ export default function ManageCoursePage() {
         onOpenChange={setShowAddVideo}
         courseId={courseId!}
         onVideoAdded={fetchCourseData}
+      />
+
+      <EditCourseDialog
+        open={showEditCourse}
+        onOpenChange={setShowEditCourse}
+        courseId={courseId!}
+        currentTitle={courseTitle}
+        currentDescription={courseDescription}
+        onCourseUpdated={fetchCourseData}
       />
     </div>
   );
