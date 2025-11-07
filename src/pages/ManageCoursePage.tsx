@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Plus, Trash2, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AddVideoDialog from "@/components/AddVideoDialog";
+import CourseKnowledgeBase from "@/components/CourseKnowledgeBase";
 
 interface Video {
   id: string;
@@ -85,53 +86,58 @@ export default function ManageCoursePage() {
           </Button>
         </div>
 
-        {videos.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-16">
-              <Upload className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No videos yet</h3>
-              <p className="text-muted-foreground mb-4">Start adding videos to your course</p>
-              <Button onClick={() => setShowAddVideo(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Your First Video
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {videos.map((video, index) => (
-              <Card key={video.id}>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-sm">#{index + 1}</span>
-                        {video.title}
-                      </CardTitle>
-                      {video.description && (
-                        <p className="text-muted-foreground mt-1">{video.description}</p>
-                      )}
+        <CourseKnowledgeBase courseId={courseId!} />
+
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Course Videos</h2>
+          {videos.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <Upload className="h-16 w-16 text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No videos yet</h3>
+                <p className="text-muted-foreground mb-4">Start adding videos to your course</p>
+                <Button onClick={() => setShowAddVideo(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Video
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {videos.map((video, index) => (
+                <Card key={video.id}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <span className="text-muted-foreground text-sm">#{index + 1}</span>
+                          {video.title}
+                        </CardTitle>
+                        {video.description && (
+                          <p className="text-muted-foreground mt-1">{video.description}</p>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteVideo(video.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeleteVideo(video.id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                    <video src={video.video_url} controls className="w-full h-full">
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+                      <video src={video.video_url} controls className="w-full h-full">
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </main>
 
       <AddVideoDialog

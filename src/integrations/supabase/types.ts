@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      course_knowledge_base: {
+        Row: {
+          course_id: string
+          file_name: string
+          file_size: number
+          file_type: string
+          file_url: string
+          id: string
+          processed: boolean
+          uploaded_at: string
+        }
+        Insert: {
+          course_id: string
+          file_name: string
+          file_size: number
+          file_type: string
+          file_url: string
+          id?: string
+          processed?: boolean
+          uploaded_at?: string
+        }
+        Update: {
+          course_id?: string
+          file_name?: string
+          file_size?: number
+          file_type?: string
+          file_url?: string
+          id?: string
+          processed?: boolean
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_knowledge_base_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: true
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           created_at: string
