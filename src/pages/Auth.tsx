@@ -35,15 +35,19 @@ export default function Auth() {
         email,
         password,
         options: {
-          data: { full_name: fullName },
+          // Capture the selected role in user metadata so we can assign
+          // it on first login when email confirmation is enabled.
+          data: { full_name: fullName, role: selectedRole },
           emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
 
       if (error) throw error;
 
-      if (data.user) {
-        // Insert user role
+      // If email confirmation is disabled, a session is created immediately
+      // and we can insert the role client-side. If confirmation is enabled,
+      // defer role insertion to first login (handled in Dashboard).
+      if (data.session && data.user) {
         const { error: roleError } = await supabase
           .from("user_roles")
           .insert({ user_id: data.user.id, role: selectedRole });
@@ -55,6 +59,12 @@ export default function Auth() {
           description: "Welcome to LearnHub. Redirecting to dashboard...",
         });
         navigate("/dashboard");
+      } else {
+        toast({
+          title: "Confirm your email",
+          description:
+            "We sent a confirmation email. After you verify, your role will be assigned on first login.",
+        });
       }
     } catch (error: any) {
       toast({

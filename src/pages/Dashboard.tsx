@@ -30,6 +30,20 @@ export default function Dashboard() {
 
     if (roleData) {
       setUserRole(roleData.role);
+    } else {
+      // No role row yet (likely due to email confirmation being enabled at sign-up).
+      // Read the intended role from user metadata and insert now.
+      const metaRole = (session.user.user_metadata?.role as "instructor" | "student") ?? "student";
+      const { error: insertError } = await supabase
+        .from("user_roles")
+        .insert({ user_id: session.user.id, role: metaRole });
+
+      if (!insertError) {
+        setUserRole(metaRole);
+      } else {
+        // Fallback: still allow navigation, default to student
+        setUserRole("student");
+      }
     }
     setIsLoading(false);
   };

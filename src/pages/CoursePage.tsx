@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Play } from "lucide-react";
+import { ArrowLeft, Play, Bot } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import CourseAIChatbot from "@/components/CourseAIChatbot";
 
 interface Video {
   id: string;
@@ -28,6 +29,7 @@ export default function CoursePage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     if (courseId) {
@@ -94,11 +96,16 @@ export default function CoursePage() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <Button variant="ghost" onClick={() => navigate("/dashboard")}> 
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
+          {!isLoading && (
+            <Button variant="default" onClick={() => setIsChatOpen(true)}>
+              <Bot className="h-4 w-4 mr-2" /> Ask AI Assistant
+            </Button>
+          )}
         </div>
       </header>
 
@@ -179,6 +186,7 @@ export default function CoursePage() {
           </div>
         </div>
       </main>
+      <CourseAIChatbot courseId={courseId!} isOpen={isChatOpen} onOpenChange={setIsChatOpen} />
     </div>
   );
 }
