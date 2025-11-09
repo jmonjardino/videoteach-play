@@ -12,8 +12,183 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
-  public: {
-    Tables: {
+    public: {
+      Tables: {
+      learner_progress: {
+        Row: {
+          id: string
+          user_id: string
+          course_id: string
+          video_id: string | null
+          status: 'not_started' | 'in_progress' | 'completed'
+          score: number | null
+          time_spent_seconds: number | null
+          started_at: string
+          completed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          course_id: string
+          video_id?: string | null
+          status: 'not_started' | 'in_progress' | 'completed'
+          score?: number | null
+          time_spent_seconds?: number | null
+          started_at?: string
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          course_id?: string
+          video_id?: string | null
+          status?: 'not_started' | 'in_progress' | 'completed'
+          score?: number | null
+          time_spent_seconds?: number | null
+          started_at?: string
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learner_progress_course_id_fkey",
+            columns: ["course_id"],
+            isOneToOne: false,
+            referencedRelation: "courses",
+            referencedColumns: ["id"],
+          },
+          {
+            foreignKeyName: "learner_progress_video_id_fkey",
+            columns: ["video_id"],
+            isOneToOne: false,
+            referencedRelation: "videos",
+            referencedColumns: ["id"],
+          },
+        ]
+      }
+      course_enrollments: {
+        Row: {
+          id: string
+          user_id: string
+          course_id: string
+          current_status: 'enrolled' | 'dropped' | 'completed'
+          status_changed_at: string
+          enrolled_at: string | null
+          completed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          course_id: string
+          current_status: 'enrolled' | 'dropped' | 'completed'
+          status_changed_at?: string
+          enrolled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          course_id?: string
+          current_status?: 'enrolled' | 'dropped' | 'completed'
+          status_changed_at?: string
+          enrolled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_enrollments_course_id_fkey",
+            columns: ["course_id"],
+            isOneToOne: false,
+            referencedRelation: "courses",
+            referencedColumns: ["id"],
+          },
+        ]
+      }
+      learning_streaks: {
+        Row: {
+          id: string
+          user_id: string
+          current_streak: number
+          longest_streak: number
+          last_active_date: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          current_streak?: number
+          longest_streak?: number
+          last_active_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          current_streak?: number
+          longest_streak?: number
+          last_active_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      learner_achievements: {
+        Row: {
+          id: string
+          user_id: string
+          course_id: string | null
+          type: string
+          title: string
+          description: string | null
+          icon: string | null
+          achieved_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          course_id?: string | null
+          type: string
+          title: string
+          description?: string | null
+          icon?: string | null
+          achieved_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          course_id?: string | null
+          type?: string
+          title?: string
+          description?: string | null
+          icon?: string | null
+          achieved_at?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learner_achievements_course_id_fkey",
+            columns: ["course_id"],
+            isOneToOne: false,
+            referencedRelation: "courses",
+            referencedColumns: ["id"],
+          },
+        ]
+      }
       course_knowledge_base: {
         Row: {
           course_id: string

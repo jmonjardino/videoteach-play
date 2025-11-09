@@ -3,7 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, BookOpen, GraduationCap } from "lucide-react";
+import { LogOut, BookOpen, GraduationCap, Activity } from "lucide-react";
+import StatsCards from "@/components/learner/StatsCards";
+import ContinueLearning from "@/components/learner/ContinueLearning";
+import ActivityChart from "@/components/learner/ActivityChart";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -205,6 +208,33 @@ export default function StudentDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Analytics overview */}
+        <section className="space-y-6 mb-10" aria-labelledby="learner-stats">
+          <div className="flex items-center gap-2">
+            <Activity className="h-5 w-5 text-primary" />
+            <h2 id="learner-stats" className="text-2xl font-bold">Your Learning Stats</h2>
+          </div>
+          <StatsCards />
+        </section>
+
+        {/* Continue Learning section */}
+        <section className="space-y-4 mb-10" aria-labelledby="continue-learning">
+          <div>
+            <h2 id="continue-learning" className="text-2xl font-bold mb-2">Continue Learning</h2>
+            <p className="text-muted-foreground">Pick up where you left off</p>
+          </div>
+          <ContinueLearning />
+        </section>
+
+        {/* Activity chart */}
+        <section className="space-y-4 mb-10" aria-labelledby="activity-chart">
+          <div>
+            <h2 id="activity-chart" className="text-2xl font-bold mb-2">Activity Chart</h2>
+            <p className="text-muted-foreground">Track your learning time over time</p>
+          </div>
+          <ActivityChart />
+        </section>
+
         <Tabs defaultValue="browse" className="w-full">
           <TabsList className="mb-8">
             <TabsTrigger value="browse">Browse Courses</TabsTrigger>

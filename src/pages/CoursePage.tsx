@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Play, Bot } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import CourseAIChatbot from "@/components/CourseAIChatbot";
+import { useToast } from "@/hooks/use-toast";
+import { markLessonCompleted, getCompletedVideoIds } from "@/services/learnerAnalyticsService";
 
 interface Video {
   id: string;
@@ -25,11 +27,29 @@ interface Course {
 export default function CoursePage() {
   const { courseId } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [course, setCourse] = useState<Course | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+
+  // Load completion state for videos when course and user are known
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || !courseId) return;
+        const ids = await getCompletedVideoIds(user.id, courseId);
+        setCompletedIds(new Set(ids));
+      } catch (e) {
+        // non-blocking
+        console.warn("Failed to load completed video ids", e);
+      }
+    })();
+  }, [courseId]);
 
   useEffect(() => {
     if (courseId) {
@@ -125,13 +145,71 @@ export default function CoursePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                    <video
-                      src={currentVideo.video_url}
-                      controls
-                      className="w-full h-full rounded-lg"
+                    {(() => {
+                      const url = currentVideo.video_url || "";
+                      const isYouTube = url.includes("youtube.com") || url.includes("youtu.be");
+                      if (isYouTube) {
+                        // If stored URL is not an embed, try to convert
+                        const toEmbed = (raw: string) => {
+                          try {
+                            const u = new URL(raw);
+                            if (u.hostname === "youtu.be") {
+                              const id = u.pathname.replace("/", "");
+                              return id ? `https://www.youtube.com/embed/${id}` : raw;
+                            }
+                            if (u.hostname.includes("youtube.com")) {
+                              const v = u.searchParams.get("v");
+                              if (v) return `https://www.youtube.com/embed/${v}`;
+                              const parts = u.pathname.split("/").filter(Boolean);
+                              const idx = parts.findIndex((p) => p === "embed");
+                              if (idx >= 0 && parts[idx + 1]) return `https://www.youtube.com/embed/${parts[idx + 1]}`;
+                            }
+                          } catch {}
+                          return raw;
+                        };
+                        const embed = url.includes("/embed/") ? url : toEmbed(url);
+                        return (
+                          <iframe
+                            className="w-full h-full rounded-lg"
+                            src={embed}
+                            title={currentVideo.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                          />
+                        );
+                      }
+                      return (
+                        <video src={url} controls className="w-full h-full rounded-lg">
+                          Your browser does not support the video tag.
+                        </video>
+                      );
+                    })()}
+                  </div>
+                  <div className="flex justify-end mt-4">
+                    <Button
+                      variant={completedIds.has(currentVideo.id) ? "outline" : "default"}
+                      disabled={isCompleting}
+                      onClick={async () => {
+                        try {
+                          setIsCompleting(true);
+                          const { data: { user } } = await supabase.auth.getUser();
+                          if (!user) { navigate("/auth"); return; }
+                          await markLessonCompleted({
+                            userId: user.id,
+                            courseId: courseId!,
+                            videoId: currentVideo.id,
+                          });
+                          setCompletedIds((prev) => new Set(prev).add(currentVideo.id));
+                          toast({ title: "Marked as complete", description: "Lesson saved as completed." });
+                        } catch (e: any) {
+                          toast({ title: "Could not mark complete", description: e.message, variant: "destructive" });
+                        } finally {
+                          setIsCompleting(false);
+                        }
+                      }}
                     >
-                      Your browser does not support the video tag.
-                    </video>
+                      {completedIds.has(currentVideo.id) ? "Completed" : "Mark as complete"}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

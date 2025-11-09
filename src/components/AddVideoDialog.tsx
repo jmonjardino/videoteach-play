@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Upload } from "lucide-react";
 
 interface AddVideoDialogProps {
   open: boolean;
@@ -20,14 +19,38 @@ export default function AddVideoDialog({ open, onOpenChange, courseId, onVideoAd
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+
+  const toEmbedUrl = (url: string): string | null => {
+    try {
+      const u = new URL(url);
+      // Support youtu.be/<id>
+      if (u.hostname === "youtu.be") {
+        const id = u.pathname.replace("/", "");
+        return id ? `https://www.youtube.com/embed/${id}` : null;
+      }
+      // Support youtube.com/watch?v=<id>
+      if (u.hostname.includes("youtube.com")) {
+        const v = u.searchParams.get("v");
+        if (v) return `https://www.youtube.com/embed/${v}`;
+        // Also support /embed/<id>
+        const parts = u.pathname.split("/").filter(Boolean);
+        const idx = parts.findIndex((p) => p === "embed");
+        if (idx >= 0 && parts[idx + 1]) return `https://www.youtube.com/embed/${parts[idx + 1]}`;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!videoFile) {
+    const embedUrl = toEmbedUrl(youtubeUrl.trim());
+    if (!embedUrl) {
       toast({
-        title: "No video selected",
-        description: "Please select a video file to upload",
+        title: "Invalid YouTube URL",
+        description: "Provide a valid YouTube or youtu.be link (unlisted recommended).",
         variant: "destructive",
       });
       return;
@@ -38,21 +61,6 @@ export default function AddVideoDialog({ open, onOpenChange, courseId, onVideoAd
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-
-      // Upload video to storage
-      const fileExt = videoFile.name.split(".").pop();
-      const fileName = `${user.id}/${courseId}/${Date.now()}.${fileExt}`;
-
-      const { error: uploadError, data } = await supabase.storage
-        .from("course-videos")
-        .upload(fileName, videoFile);
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from("course-videos")
-        .getPublicUrl(fileName);
 
       // Get current max order_index
       const { data: videos } = await supabase
@@ -69,7 +77,7 @@ export default function AddVideoDialog({ open, onOpenChange, courseId, onVideoAd
         course_id: courseId,
         title,
         description: description || null,
-        video_url: publicUrl,
+        video_url: embedUrl,
         order_index: nextOrderIndex,
       });
 
@@ -77,12 +85,12 @@ export default function AddVideoDialog({ open, onOpenChange, courseId, onVideoAd
 
       toast({
         title: "Video added!",
-        description: "Your video has been uploaded successfully",
+        description: "Your YouTube video is now linked and playable in-app",
       });
 
       setTitle("");
       setDescription("");
-      setVideoFile(null);
+      setYoutubeUrl("");
       onOpenChange(false);
       onVideoAdded();
     } catch (error: any) {
@@ -100,8 +108,8 @@ export default function AddVideoDialog({ open, onOpenChange, courseId, onVideoAd
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Video</DialogTitle>
-          <DialogDescription>Upload a new video to your course</DialogDescription>
+          <DialogTitle>Add YouTube Video</DialogTitle>
+          <DialogDescription>Paste an unlisted YouTube link to stream in your course</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -125,25 +133,19 @@ export default function AddVideoDialog({ open, onOpenChange, courseId, onVideoAd
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="video-file">Video File</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="video-file"
-                type="file"
-                accept="video/*"
-                onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
-                required
-              />
-              <Upload className="h-5 w-5 text-muted-foreground" />
-            </div>
-            {videoFile && (
-              <p className="text-sm text-muted-foreground">
-                Selected: {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
-              </p>
-            )}
+            <Label htmlFor="youtube-url">YouTube URL</Label>
+            <Input
+              id="youtube-url"
+              type="url"
+              placeholder="https://www.youtube.com/watch?v=VIDEO_ID or https://youtu.be/VIDEO_ID"
+              value={youtubeUrl}
+              onChange={(e) => setYoutubeUrl(e.target.value)}
+              required
+            />
+            <p className="text-xs text-muted-foreground">Use an unlisted video for privacy. It will play inside this app.</p>
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Uploading..." : "Upload Video"}
+            {isLoading ? "Linking..." : "Add YouTube Video"}
           </Button>
         </form>
       </DialogContent>
