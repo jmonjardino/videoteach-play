@@ -10,6 +10,7 @@ import CoursePage from "./pages/CoursePage";
 import ManageCoursePage from "./pages/ManageCoursePage";
 import NotFound from "./pages/NotFound";
 import BrowseCourses from "./pages/BrowseCourses";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/courses" element={<BrowseCourses />} />
           <Route path="/course/:courseId" element={<CoursePage />} />
           <Route path="/course/:courseId/manage" element={<ManageCoursePage />} />
