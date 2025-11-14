@@ -52,42 +52,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Proof of Concept Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-10">
-          <h2 className="text-4xl font-bold mb-3">Proof of Concept with Real Users</h2>
-          <p className="text-lg text-muted-foreground">Our AI assistant already helps learners stay engaged and finish more courses.</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="p-3 bg-primary/10 rounded-full w-fit mb-4">
-                <Users className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Early Users</h3>
-              <p className="text-muted-foreground">100+ learners in pilot cohorts actively using AI Q&A.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="p-3 bg-accent/10 rounded-full w-fit mb-4">
-                <Bot className="h-6 w-6 text-accent" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Higher Completion</h3>
-              <p className="text-muted-foreground">Learners using AI complete lessons 25% more often in trials.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="p-3 bg-primary/10 rounded-full w-fit mb-4">
-                <GraduationCap className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Satisfaction</h3>
-              <p className="text-muted-foreground">92% of pilot users would recommend AI-assisted learning.</p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+      {/* Removed Proof of Concept section */}
 
       {/* Features Section */}
       <section className="container mx-auto px-4 py-20">

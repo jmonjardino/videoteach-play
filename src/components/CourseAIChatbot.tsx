@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import type { Message } from "@/services/courseChatService";
 import { sendChatMessage, getChatHistory, createChatSession } from "@/services/courseChatService";
 import ChatHistorySidebar from "@/components/ChatHistorySidebar";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 
 interface CourseAIChatbotProps {
   courseId: string;
@@ -99,6 +101,12 @@ export default function CourseAIChatbot({ courseId, isOpen, onOpenChange }: Cour
     }
   };
 
+  const renderAssistantHtml = (md: string) => {
+    const html = marked(md);
+    const clean = DOMPurify.sanitize(html);
+    return { __html: clean } as { __html: string };
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[960px]">
@@ -147,18 +155,30 @@ export default function CourseAIChatbot({ courseId, isOpen, onOpenChange }: Cour
                   )}
                   {messages.map((m, idx) => (
                     <div key={idx} className="group">
-                    <div className={`flex items-start gap-3 ${m.role === "assistant" ? "" : "flex-row-reverse"}`}>
-                      <div className={`max-w-[80%] rounded-md px-3 py-2 text-sm ${m.role === "assistant" ? "bg-muted" : "bg-primary text-primary-foreground"}`}>
-                        {m.content}
+                      <div className={`flex items-start gap-3 ${m.role === "assistant" ? "" : "flex-row-reverse"}`}>
+                        {m.role === "assistant" ? (
+                          <div
+                            className={`max-w-[80%] rounded-md px-3 py-2 text-sm bg-muted`}
+                            dangerouslySetInnerHTML={renderAssistantHtml(m.content)}
+                          />
+                        ) : (
+                          <div className={`max-w-[80%] rounded-md px-3 py-2 text-sm bg-primary text-primary-foreground`}>
+                            {m.content}
+                          </div>
+                        )}
+                      </div>
+                      <div className={`mt-1 flex ${m.role === "assistant" ? "" : "justify-end"}`}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => copyToClipboard(m.content)}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    <div className={`mt-1 flex ${m.role === "assistant" ? "" : "justify-end"}`}>
-                      <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => copyToClipboard(m.content)}>
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
                   {isLoading && (
                     <div className="text-sm text-muted-foreground">Assistant is typing…</div>
                   )}
