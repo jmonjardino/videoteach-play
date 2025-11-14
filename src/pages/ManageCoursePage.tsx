@@ -25,6 +25,7 @@ export default function ManageCoursePage() {
   const [courseTitle, setCourseTitle] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
   const [coursePrice, setCoursePrice] = useState<number>(0);
+  const [enrollmentCount, setEnrollmentCount] = useState<number>(0);
   const [showAddVideo, setShowAddVideo] = useState(false);
   const [showEditCourse, setShowEditCourse] = useState(false);
 
@@ -46,6 +47,13 @@ export default function ManageCoursePage() {
       setCourseDescription(courseData.description || "");
       setCoursePrice(courseData.price ?? 0);
     }
+
+    // Fetch enrollments count
+    const { count } = await supabase
+      .from("enrollments")
+      .select("*", { count: "exact", head: true })
+      .eq("course_id", courseId);
+    setEnrollmentCount(count ?? 0);
 
     const { data: videosData } = await supabase
       .from("videos")
@@ -98,6 +106,11 @@ export default function ManageCoursePage() {
             {courseDescription && (
               <p className="text-muted-foreground mb-2">{courseDescription}</p>
             )}
+            <div className="flex flex-wrap gap-4 text-sm mb-2">
+              <span>Price: €{coursePrice.toFixed(2)}</span>
+              <span>Enrollments: {enrollmentCount}</span>
+              <span className="font-medium">Revenue: €{(coursePrice * enrollmentCount).toFixed(2)}</span>
+            </div>
             <p className="text-sm text-muted-foreground">Manage course content</p>
           </div>
           <Button onClick={() => setShowAddVideo(true)}>

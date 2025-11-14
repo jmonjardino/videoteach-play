@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, LogOut, BookOpen, Users } from "lucide-react";
+import { Plus, LogOut, BookOpen, Users, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import CreateCourseDialog from "./CreateCourseDialog";
@@ -13,6 +13,9 @@ interface Course {
   description: string;
   thumbnail_url: string | null;
   created_at: string;
+  price?: number;
+  enrollment_count?: number;
+  revenue?: number;
 }
 
 export default function InstructorDashboard() {
@@ -50,7 +53,27 @@ export default function InstructorDashboard() {
       .eq("instructor_id", user.id)
       .order("created_at", { ascending: false });
 
-    if (data) setCourses(data);
+    if (data) {
+      const augmented = await Promise.all(
+        data.map(async (course: any) => {
+          const { count } = await supabase
+            .from("enrollments")
+            .select("*", { count: "exact", head: true })
+            .eq("course_id", course.id);
+
+          const price = typeof course.price === "number" ? course.price : 0;
+          const enrollments = count ?? 0;
+          const revenue = Number((price * enrollments).toFixed(2));
+
+          return {
+            ...course,
+            enrollment_count: enrollments,
+            revenue,
+          } as Course;
+        })
+      );
+      setCourses(augmented);
+    }
   };
 
   const handleSignOut = async () => {
@@ -128,9 +151,20 @@ export default function InstructorDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Users className="h-4 w-4 mr-1" />
-                    <span>Manage videos & students</span>
+                  <div className="flex flex-col gap-1 text-sm">
+                    <div className="text-muted-foreground flex items-center">
+                      <Users className="h-4 w-4 mr-1" />
+                      <span>Enrollments: {course.enrollment_count ?? 0}</span>
+                    </div>
+                    <div className="text-muted-foreground flex items-center">
+                      <DollarSign className="h-4 w-4 mr-1" />
+                      <span>
+                        Price: €{(typeof course.price === "number" ? course.price : 0).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="font-medium">
+                      Revenue: €{(typeof course.revenue === "number" ? course.revenue : 0).toFixed(2)}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
