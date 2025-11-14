@@ -56,7 +56,7 @@ export default function Auth() {
 
         toast({
           title: "Account created!",
-          description: "Welcome to LearnHub. Redirecting to dashboard...",
+          description: "Welcome to Viora. Redirecting to dashboard...",
         });
         navigate("/dashboard");
       } else {
@@ -114,7 +114,7 @@ export default function Auth() {
               <GraduationCap className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Welcome to LearnHub</CardTitle>
+          <CardTitle className="text-2xl">Welcome to Viora</CardTitle>
           <CardDescription>Start your learning journey today</CardDescription>
         </CardHeader>
         <CardContent>

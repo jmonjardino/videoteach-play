@@ -19,6 +19,7 @@ interface EditCourseDialogProps {
   courseId: string;
   currentTitle: string;
   currentDescription: string;
+  currentPrice?: number;
   onCourseUpdated: () => void;
 }
 
@@ -28,11 +29,15 @@ export default function EditCourseDialog({
   courseId,
   currentTitle,
   currentDescription,
+  currentPrice,
   onCourseUpdated,
 }: EditCourseDialogProps) {
   const { toast } = useToast();
   const [title, setTitle] = useState(currentTitle);
   const [description, setDescription] = useState(currentDescription);
+  const [price, setPrice] = useState<string>(
+    typeof currentPrice === "number" ? currentPrice.toFixed(2) : "0"
+  );
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,11 +55,15 @@ export default function EditCourseDialog({
     setLoading(true);
 
     try {
+      const priceValue = parseFloat(price);
+      const safePrice = isNaN(priceValue) || priceValue < 0 ? 0 : Number(priceValue.toFixed(2));
+
       const { error } = await supabase
         .from("courses")
         .update({
           title: title.trim(),
           description: description.trim() || null,
+          price: safePrice,
         })
         .eq("id", courseId);
 
@@ -85,7 +94,7 @@ export default function EditCourseDialog({
         <DialogHeader>
           <DialogTitle>Edit Course</DialogTitle>
           <DialogDescription>
-            Update your course title and description
+            Update your course title, description, and price
           </DialogDescription>
         </DialogHeader>
 
@@ -110,6 +119,19 @@ export default function EditCourseDialog({
               placeholder="Describe what students will learn in this course..."
               rows={4}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="price">Course Price</Label>
+            <Input
+              id="price"
+              type="number"
+              min="0"
+              step="0.01"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">Shown to users, but enrollment remains free.</p>
           </div>
 
           <div className="flex justify-end gap-2">

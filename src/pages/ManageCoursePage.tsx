@@ -24,6 +24,7 @@ export default function ManageCoursePage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [courseTitle, setCourseTitle] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
+  const [coursePrice, setCoursePrice] = useState<number>(0);
   const [showAddVideo, setShowAddVideo] = useState(false);
   const [showEditCourse, setShowEditCourse] = useState(false);
 
@@ -36,13 +37,14 @@ export default function ManageCoursePage() {
   const fetchCourseData = async () => {
     const { data: courseData } = await supabase
       .from("courses")
-      .select("title, description")
+      .select("title, description, price")
       .eq("id", courseId)
       .single();
 
     if (courseData) {
       setCourseTitle(courseData.title);
       setCourseDescription(courseData.description || "");
+      setCoursePrice(courseData.price ?? 0);
     }
 
     const { data: videosData } = await supabase
@@ -165,12 +167,13 @@ export default function ManageCoursePage() {
         onVideoAdded={fetchCourseData}
       />
 
-      <EditCourseDialog
-        open={showEditCourse}
+      <EditCourseDialog 
+        open={showEditCourse} 
         onOpenChange={setShowEditCourse}
         courseId={courseId!}
         currentTitle={courseTitle}
         currentDescription={courseDescription}
+        currentPrice={coursePrice}
         onCourseUpdated={fetchCourseData}
       />
     </div>

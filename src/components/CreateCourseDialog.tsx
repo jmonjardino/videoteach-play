@@ -18,6 +18,7 @@ export default function CreateCourseDialog({ open, onOpenChange, onCourseCreated
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [price, setPrice] = useState<string>("0");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,10 +28,14 @@ export default function CreateCourseDialog({ open, onOpenChange, onCourseCreated
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      const priceValue = parseFloat(price);
+      const safePrice = isNaN(priceValue) || priceValue < 0 ? 0 : Number(priceValue.toFixed(2));
+
       const { error } = await supabase.from("courses").insert({
         instructor_id: user.id,
         title,
         description,
+        price: safePrice,
       });
 
       if (error) throw error;
@@ -42,6 +47,7 @@ export default function CreateCourseDialog({ open, onOpenChange, onCourseCreated
 
       setTitle("");
       setDescription("");
+      setPrice("0");
       onOpenChange(false);
       onCourseCreated();
     } catch (error: any) {
@@ -85,6 +91,19 @@ export default function CreateCourseDialog({ open, onOpenChange, onCourseCreated
               rows={4}
               required
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="price">Price</Label>
+            <Input
+              id="price"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">Shown to users, but enrollment remains free.</p>
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Creating..." : "Create Course"}

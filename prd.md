@@ -1,14 +1,14 @@
 Product Requirements Document (PRD)
-LearnHub - Free Online Learning Platform
+ Viora - Free AI-Powered Learning Platform
 Document Information
 Version: 1.0
 Last Updated: November 7, 2025
 Product Owner: [Your Name]
 Status: MVP Complete
 1. Executive Summary
-LearnHub is a free, open-access platform where instructors create video-based courses and students enroll at no cost. The MVP delivers secure authentication, role-based dashboards, simple course creation and management, video uploads, knowledge base document support, and one-click student enrollment. The platform prioritizes accessibility, simplicity, and scalability using React, Vite, Tailwind, and Supabase. Success is measured by growth in courses and enrollments, completion rates, instructor satisfaction, and reliable performance.
+Viora is a free, open-access platform where instructors create video-based courses and students enroll at no cost. The MVP delivers secure authentication, role-based dashboards, simple course creation and management, video uploads, knowledge base document support, and one-click student enrollment. Teachers can set a visible course price for context, but enrollment remains free. The platform prioritizes accessibility, simplicity, and scalability using React, Vite, Tailwind, and Supabase. Success is measured by growth in courses and enrollments, completion rates, instructor satisfaction, and reliable performance.
 1.1 Product Vision
-LearnHub is a free, open-access online learning platform that enables instructors to create and share educational courses with students worldwide. The platform eliminates financial barriers to education by providing completely free course enrollment while empowering educators to share knowledge through video-based content and AI-powered assistance.
+Viora is a free, open-access online learning platform that enables instructors to create and share educational courses with students worldwide. The platform eliminates financial barriers to education by providing completely free course enrollment while empowering educators to share knowledge through video-based content and AI-powered assistance.
 
 1.2 Product Goals
 Democratize access to quality education by making all courses free
@@ -590,6 +590,6 @@ React Documentation
 Shadcn/ui Components
 Document End
 
-This PRD represents the current state of LearnHub as an MVP. It should be treated as a living document and updated as features are added or requirements change.
+This PRD represents the current state of Viora as an MVP. It should be treated as a living document and updated as features are added or requirements change.
 
 <lov-actions> <lov-suggestion message="Implement the AI chatbot feature using the uploaded knowledge base documents. Process PDFs/DOCX to extract text, store embeddings, and create a chat interface for students to ask questions about course content using Lovable AI.">Add AI Course Assistant</lov-suggestion> <lov-suggestion message="Add course progress tracking for students. Track video completion status, calculate progress percentage, show resume points, and issue completion certificates when students finish all videos.">Add Progress Tracking</lov-suggestion> <lov-suggestion message="Implement a rating and review system for courses. Allow students to rate courses (1-5 stars), write reviews, and display average ratings on course cards to help other students choose courses.">Add Course Ratings & Reviews</lov-suggestion> <lov-suggestion message="Create a search and filter system for courses. Add search bar, filter by category/difficulty/instructor, sort by newest/popular/rating, and implement full-text search across course titles and descriptions.">Add Course Search & Filters</lov-suggestion> <lov-suggestion message="Build an instructor analytics dashboard showing enrollment metrics, video view counts, student progress statistics, popular courses, and engagement trends with charts and visualizations.">Add Analytics Dashboard</lov-suggestion>

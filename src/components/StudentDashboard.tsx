@@ -17,6 +17,7 @@ interface Course {
   thumbnail_url: string | null;
   instructor_id: string;
   instructor_name?: string | null;
+  price?: number;
 }
 
 export default function StudentDashboard() {
@@ -159,6 +160,9 @@ export default function StudentDashboard() {
         <p className="text-sm text-muted-foreground">
           by {course.instructor_name || "Unknown Instructor"}
         </p>
+        <p className="text-sm mt-1">
+          Price: €{(typeof course.price === "number" ? course.price : 0).toFixed(2)}
+        </p>
       </CardHeader>
       <CardContent>
         {showEnroll ? (
@@ -185,6 +189,7 @@ export default function StudentDashboard() {
             Continue Learning
           </Button>
         )}
+        <p className="text-xs text-muted-foreground mt-2">Enrollment is currently free.</p>
       </CardContent>
     </Card>
   );
@@ -196,7 +201,7 @@ export default function StudentDashboard() {
           <div className="flex items-center gap-3">
             <GraduationCap className="h-6 w-6 text-primary" />
             <div>
-              <h1 className="text-xl font-bold">LearnHub</h1>
+              <h1 className="text-xl font-bold">Viora</h1>
               <p className="text-sm text-muted-foreground">Welcome back, {userName}</p>
             </div>
           </div>

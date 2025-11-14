@@ -92,7 +92,7 @@ const Index = () => {
       {/* Features Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">Why Choose LearnHub?</h2>
+          <h2 className="text-4xl font-bold mb-4">Why Choose Viora?</h2>
           <p className="text-xl text-muted-foreground">
             Everything you need to learn and teach online
           </p>

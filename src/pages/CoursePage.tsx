@@ -22,6 +22,7 @@ interface Course {
   title: string;
   description: string;
   instructor_id: string;
+  price?: number;
 }
 
 export default function CoursePage() {
@@ -131,7 +132,8 @@ export default function CoursePage() {
 
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-2">{course?.title}</h1>
-        <p className="text-muted-foreground mb-8">{course?.description}</p>
+        <p className="text-muted-foreground mb-4">{course?.description}</p>
+        <p className="mb-8 text-sm">Price: €{(typeof course?.price === "number" ? course?.price : 0).toFixed(2)} — Enrollment is free.</p>
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">

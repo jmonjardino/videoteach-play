@@ -66,7 +66,7 @@ export default function InstructorDashboard() {
           <div className="flex items-center gap-3">
             <BookOpen className="h-6 w-6 text-primary" />
             <div>
-              <h1 className="text-xl font-bold">LearnHub Instructor</h1>
+              <h1 className="text-xl font-bold">Viora Instructor</h1>
               <p className="text-sm text-muted-foreground">Welcome back, {userName}</p>
             </div>
           </div>

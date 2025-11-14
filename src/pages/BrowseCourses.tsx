@@ -1,14 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import type { Tables } from "@/integrations/supabase/types";
+// Use a local Course type to allow optional price until types are regenerated
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 
-type Course = Tables<"courses">;
+interface Course {
+  id: string;
+  title: string;
+  description: string | null;
+  thumbnail_url: string | null;
+  created_at: string;
+  updated_at: string;
+  instructor_id: string;
+  price?: number;
+}
 
 export default function BrowseCourses() {
   const navigate = useNavigate();
@@ -112,8 +121,9 @@ export default function BrowseCourses() {
                     <div className="w-full h-40 bg-muted rounded-md mb-3" />
                   )}
                   {c.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{c.description}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-3 mb-2">{c.description}</p>
                   )}
+                  <p className="text-sm mb-4">Price: €{(typeof c.price === "number" ? c.price : 0).toFixed(2)}</p>
                   <div className="flex justify-end">
                     <Button onClick={() => navigate(`/course/${c.id}`)}>
                       View Course
